@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate SubTrackr Icons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .icon-item canvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .download-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .download-btn:hover {
+            background: #1565c0;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #1976d2;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 SubTrackr Chrome Extension Icon Generator</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li><strong>Right-click</strong> on each icon below</li>
+                <li>Select <strong>"Save image as..."</strong></li>
+                <li>Save with the correct filename (e.g., <code>icon16.png</code>)</li>
+                <li>Place all icons in the <code>chrome-extension/icons/</code> folder</li>
+            </ol>
+        </div>
+        
+        <div class="icon-preview" id="iconPreview">
+            <!-- Icons will be generated here -->
+        </div>
+        
+        <div class="instructions">
+            <h3>🔧 Alternative Method:</h3>
+            <p>If the above doesn't work, you can:</p>
+            <ol>
+                <li>Use any image editor (Photoshop, GIMP, Figma)</li>
+                <li>Create a simple blue circle with a white plus symbol</li>
+                <li>Export as PNG in the required sizes: 16x16, 32x32, 48x48, 128x128</li>
+                <li>Save as <code>icon16.png</code>, <code>icon32.png</code>, etc.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Icon sizes required by Chrome extension
+        const iconSizes = [16, 32, 48, 128];
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Scale factor for the icon
+            const scale = size / 128;
+            
+            // Background circle
+            ctx.fillStyle = '#1976d2';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // White border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(1, scale * 4);
+            ctx.stroke();
+            
+            // Calendar background
+            const calX = size * 0.25;
+            const calY = size * 0.3125;
+            const calW = size * 0.5;
+            const calH = size * 0.375;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(calX, calY, calW, calH);
+            
+            // Calendar header
+            ctx.fillStyle = '#1976d2';
+            ctx.fillRect(calX, calY, calW, size * 0.09375);
+            
+            // Calendar lines
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(1, scale * 2);
+            ctx.beginPath();
+            ctx.moveTo(calX + size * 0.0625, calY + size * 0.046875);
+            ctx.lineTo(calX + calW - size * 0.0625, calY + size * 0.046875);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(calX + size * 0.0625, calY + size * 0.078125);
+            ctx.lineTo(calX + calW - size * 0.0625, calY + size * 0.078125);
+            ctx.stroke();
+            
+            // Plus symbol
+            ctx.fillStyle = '#4caf50';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size * 0.15625, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(1, scale * 3);
+            ctx.lineCap = 'round';
+            
+            // Vertical line
+            ctx.beginPath();
+            ctx.moveTo(size/2, size/2 - size * 0.0625);
+            ctx.lineTo(size/2, size/2 + size * 0.0625);
+            ctx.stroke();
+            
+            // Horizontal line
+            ctx.beginPath();
+            ctx.moveTo(size/2 - size * 0.0625, size/2);
+            ctx.lineTo(size/2 + size * 0.0625, size/2);
+            ctx.stroke();
+            
+            return canvas;
+        }
+        
+        function createIconItem(size) {
+            const div = document.createElement('div');
+            div.className = 'icon-item';
+            
+            const canvas = generateIcon(size);
+            const filename = `icon${size}.png`;
+            
+            div.innerHTML = `
+                <h3>${size}x${size}</h3>
+                <canvas id="canvas${size}"></canvas>
+                <br>
+                <button class="download-btn" onclick="downloadIcon(${size}, '${filename}')">
+                    Download ${filename}
+                </button>
+            `;
+            
+            // Replace the canvas with the generated one
+            const canvasElement = div.querySelector(`#canvas${size}`);
+            canvasElement.parentNode.replaceChild(canvas, canvasElement);
+            
+            return div;
+        }
+        
+        function downloadIcon(size, filename) {
+            const canvas = generateIcon(size);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Generate all icons
+        iconSizes.forEach(size => {
+            document.getElementById('iconPreview').appendChild(createIconItem(size));
+        });
+    </script>
+</body>
+</html>

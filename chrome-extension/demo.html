@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Start Your Membership</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23e50914" width="1200" height="600"/><text x="600" y="300" text-anchor="middle" fill="white" font-size="24">Netflix Background</text></svg>');
+        }
+        
+        .hero h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .pricing {
+            background: #111;
+            padding: 60px 20px;
+        }
+        
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .pricing h3 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .plan {
+            background: #222;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .plan:hover {
+            border-color: #e50914;
+            transform: translateY(-5px);
+        }
+        
+        .plan.featured {
+            border-color: #e50914;
+            background: linear-gradient(135deg, #222 0%, #333 100%);
+        }
+        
+        .plan-name {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #e50914;
+        }
+        
+        .plan-price {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .plan-cycle {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .subscribe-btn {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .subscribe-btn:hover {
+            background: #b20710;
+            transform: scale(1.05);
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 80px 20px;
+            background: #111;
+        }
+        
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cta-btn {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-btn:hover {
+            background: #b20710;
+            transform: scale(1.05);
+        }
+        
+        .footer {
+            background: #000;
+            padding: 40px 20px;
+            text-align: center;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NETFLIX</h1>
+    </div>
+    
+    <div class="hero">
+        <h2>Unlimited movies, TV shows, and more</h2>
+        <p>Watch anywhere. Cancel anytime.</p>
+        <p>Ready to watch? Enter your email to create or restart your membership.</p>
+    </div>
+    
+    <div class="pricing">
+        <div class="pricing-container">
+            <h3>Choose the plan that's right for you</h3>
+            <div class="plans">
+                <div class="plan">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-price">$8.99</div>
+                    <div class="plan-cycle">per month</div>
+                    <ul class="plan-features">
+                        <li>Good video quality</li>
+                        <li>Good audio quality</li>
+                        <li>Watch on your TV or computer</li>
+                        <li>Watch on 1 device at a time</li>
+                    </ul>
+                    <button class="subscribe-btn">Start Basic</button>
+                </div>
+                
+                <div class="plan featured">
+                    <div class="plan-name">Standard</div>
+                    <div class="plan-price">$13.99</div>
+                    <div class="plan-cycle">per month</div>
+                    <ul class="plan-features">
+                        <li>Better video quality</li>
+                        <li>Better audio quality</li>
+                        <li>Watch on your TV, computer, or mobile device</li>
+                        <li>Watch on 2 devices at a time</li>
+                        <li>Watch in HD when available</li>
+                    </ul>
+                    <button class="subscribe-btn">Start Standard</button>
+                </div>
+                
+                <div class="plan">
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-price">$17.99</div>
+                    <div class="plan-cycle">per month</div>
+                    <ul class="plan-features">
+                        <li>Best video quality</li>
+                        <li>Best audio quality</li>
+                        <li>Watch on your TV, computer, or mobile device</li>
+                        <li>Watch on 4 devices at a time</li>
+                        <li>Watch in Ultra HD when available</li>
+                        <li>Watch in HDR when available</li>
+                    </ul>
+                    <button class="subscribe-btn">Start Premium</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h2>Ready to watch?</h2>
+        <p>Enter your email to create or restart your membership.</p>
+        <button class="cta-btn">Get Started</button>
+    </div>
+    
+    <div class="footer">
+        <p>Questions? Call 1-844-505-2993</p>
+        <p>© 1997-2024 Netflix, Inc.</p>
+    </div>
+    
+    <script>
+        // Simulate subscription flow
+        document.querySelectorAll('.subscribe-btn, .cta-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('This is a demo page. In a real scenario, this would take you to the subscription flow where the SubTrackr extension would detect the subscription intent.');
+            });
+        });
+        
+        // Add some subscription-related text to help with detection
+        document.body.innerHTML += `
+            <div style="display: none;">
+                <p>subscribe to netflix</p>
+                <p>start your membership</p>
+                <p>join netflix</p>
+                <p>sign up for netflix</p>
+                <p>netflix subscription</p>
+                <p>netflix membership</p>
+                <p>netflix plans</p>
+                <p>netflix pricing</p>
+            </div>
+        `;
+    </script>
+</body>
+</html>
+

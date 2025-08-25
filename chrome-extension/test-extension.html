@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubTrackr Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #1976d2;
+        }
+        .test-item h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #1565c0;
+        }
+        .btn.secondary {
+            background: #6c757d;
+        }
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 SubTrackr Chrome Extension Test Page</h1>
+    
+    <div class="test-container">
+        <h2>📋 Test Checklist</h2>
+        
+        <div class="test-item">
+            <h3>1. Extension Installation</h3>
+            <div id="extensionStatus" class="status warning">Checking extension status...</div>
+            <p>Make sure the SubTrackr extension is loaded in Chrome</p>
+            <button class="btn" onclick="checkExtensionStatus()">Check Status</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>2. Server Connection</h3>
+            <div id="serverStatus" class="status warning">Checking server connection...</div>
+            <p>Verify the extension can connect to your backend server</p>
+            <button class="btn" onclick="checkServerConnection()">Test Connection</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>3. Content Script Detection</h3>
+            <div id="contentScriptStatus" class="status warning">Checking content script...</div>
+            <p>Verify the extension detects subscription content on this page</p>
+            <button class="btn" onclick="checkContentScript()">Check Detection</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>4. Floating Action Button</h3>
+            <div id="fabStatus" class="status warning">Checking FAB...</div>
+            <p>Look for the blue floating button in the bottom right corner</p>
+            <button class="btn" onclick="checkFAB()">Check FAB</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>5. Context Menu</h3>
+            <div id="contextMenuStatus" class="status warning">Checking context menu...</div>
+            <p>Right-click anywhere on this page to see "Add to SubTrackr" option</p>
+            <button class="btn" onclick="checkContextMenu()">Check Context Menu</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Test Results</h2>
+        <div id="testLog" class="log">Test log will appear here...</div>
+        <button class="btn secondary" onclick="clearLog()">Clear Log</button>
+        <button class="btn secondary" onclick="runAllTests()">Run All Tests</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>🔧 Manual Tests</h2>
+        <div class="test-item">
+            <h3>Extension Popup</h3>
+            <p>Click the SubTrackr extension icon in your toolbar to test the popup</p>
+        </div>
+        
+        <div class="test-item">
+            <h3>Demo Page</h3>
+            <p>Open <code>chrome-extension/demo.html</code> to test subscription detection</p>
+            <button class="btn" onclick="openDemoPage()">Open Demo Page</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>Real Subscription Sites</h3>
+            <p>Visit netflix.com, spotify.com, or other subscription sites to test real detection</p>
+        </div>
+    </div>
+
+    <script>
+        let testLog = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testLog.push(logEntry);
+            
+            const logElement = document.getElementById('testLog');
+            logElement.textContent = testLog.join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        function clearLog() {
+            testLog = [];
+            document.getElementById('testLog').textContent = '';
+        }
+        
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function checkExtensionStatus() {
+            log('Checking extension status...');
+            
+            // Check if extension is installed by looking for its elements
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                updateStatus('extensionStatus', '✅ Extension detected and running', 'success');
+                log('Extension is running with ID: ' + chrome.runtime.id);
+            } else {
+                updateStatus('extensionStatus', '❌ Extension not detected', 'error');
+                log('Extension not detected - make sure it\'s loaded in Chrome');
+            }
+        }
+        
+        function checkServerConnection() {
+            log('Testing server connection...');
+            
+            // Try to connect to the server
+            fetch('http://localhost:5000/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus('serverStatus', '✅ Server connected successfully', 'success');
+                    log(`Server response: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    updateStatus('serverStatus', '❌ Server connection failed', 'error');
+                    log(`Server error: ${error.message}`);
+                });
+        }
+        
+        function checkContentScript() {
+            log('Checking content script detection...');
+            
+            // Look for elements that the content script should create
+            const fab = document.getElementById('subtrackr-fab');
+            if (fab) {
+                updateStatus('contentScriptStatus', '✅ Content script detected and working', 'success');
+                log('Floating action button found');
+            } else {
+                updateStatus('contentScriptStatus', '❌ Content script not detected', 'error');
+                log('No floating action button found - content script may not be running');
+            }
+        }
+        
+        function checkFAB() {
+            log('Checking floating action button...');
+            
+            const fab = document.getElementById('subtrackr-fab');
+            if (fab) {
+                updateStatus('fabStatus', '✅ Floating action button visible', 'success');
+                log('FAB found and visible');
+                
+                // Test FAB click
+                fab.click();
+                log('FAB clicked - check for dialog');
+            } else {
+                updateStatus('fabStatus', '❌ Floating action button not found', 'error');
+                log('No FAB found');
+            }
+        }
+        
+        function checkContextMenu() {
+            log('Checking context menu...');
+            
+            // Create a test context menu event
+            const event = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                button: 2,
+                buttons: 2,
+                clientX: 100,
+                clientY: 100
+            });
+            
+            document.dispatchEvent(event);
+            updateStatus('contextMenuStatus', '✅ Context menu test completed', 'success');
+            log('Context menu event dispatched - right-click to see menu');
+        }
+        
+        function runAllTests() {
+            log('Running all tests...');
+            clearLog();
+            
+            setTimeout(() => checkExtensionStatus(), 100);
+            setTimeout(() => checkServerConnection(), 200);
+            setTimeout(() => checkContentScript(), 300);
+            setTimeout(() => checkFAB(), 400);
+            setTimeout(() => checkContextMenu(), 500);
+            
+            log('All tests completed');
+        }
+        
+        function openDemoPage() {
+            window.open('./demo.html', '_blank');
+        }
+        
+        // Auto-run basic checks when page loads
+        window.addEventListener('load', () => {
+            log('Test page loaded - running initial checks...');
+            setTimeout(() => {
+                checkExtensionStatus();
+                checkServerConnection();
+            }, 1000);
+        });
+        
+        // Listen for messages from the extension
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+                log(`Message received from extension: ${JSON.stringify(request)}`);
+                sendResponse({ received: true });
+            });
+        }
+    </script>
+</body>
+</html>
