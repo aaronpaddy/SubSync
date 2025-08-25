@@ -1,190 +1,441 @@
-# SubTrackr Backend API
+# SubSync Backend API
 
-A comprehensive Node.js/Express backend for the SubTrackr subscription and bill tracking application.
+[![Node.js](https://img.shields.io/badge/Node.js-16+-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.x-blue.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-5.0+-orange.svg)](https://mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Features
+> **SubSync Backend** - Robust API server for subscription management and Chrome extension integration.
 
-- **User Authentication**: JWT-based authentication with bcrypt password hashing
-- **Subscription Management**: CRUD operations for subscriptions and bills
-- **Notification System**: Email and SMS notifications using SendGrid and Twilio
-- **Statistics & Analytics**: Monthly/yearly cost breakdowns and category analysis
-- **Security**: Rate limiting, helmet security headers, input validation
-- **Database**: MongoDB with Mongoose ODM
+## 🚀 Overview
 
-## Tech Stack
+The SubSync backend provides a powerful REST API for managing subscriptions, user authentication, and real-time synchronization with the Chrome extension. Built with Node.js, Express, and MongoDB for scalability and performance.
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT (jsonwebtoken)
-- **Password Hashing**: bcryptjs
-- **Email**: SendGrid or Nodemailer
-- **SMS**: Twilio
-- **Security**: Helmet, CORS, Rate Limiting
+### ✨ Key Features
 
-## Installation
+- **🔐 JWT Authentication**: Secure user authentication and authorization
+- **📊 Subscription Management**: Full CRUD operations for subscriptions
+- **🔄 Real-time Sync**: Instant updates for Chrome extension
+- **📈 Analytics**: Comprehensive subscription insights and statistics
+- **🔔 Notifications**: Smart renewal reminders and alerts
+- **⚡ Performance**: Optimized queries and caching strategies
 
-1. **Clone the repository**
-   ```bash
-   cd backend
-   ```
+## 🏗️ Architecture
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+```
+SubSync Backend/
+├── 🚀 server.js           # Main server entry point
+├── 🛣️ routes/             # API endpoint definitions
+├── 🗄️ models/             # MongoDB schema definitions
+├── 🛡️ middleware/         # Authentication & validation
+├── 🛠️ utils/              # Utility functions & helpers
+└── ⚙️ config/             # Configuration & environment
+```
 
-3. **Environment Setup**
-   ```bash
-   cp env.example .env
-   ```
-   
-   Edit `.env` with your configuration:
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   MONGODB_URI=mongodb://localhost:27017/subtrackr
-   JWT_SECRET=your_jwt_secret_key_here
-   JWT_EXPIRE=7d
-   SENDGRID_API_KEY=your_sendgrid_api_key_here
-   EMAIL_FROM=noreply@subtrackr.com
-   TWILIO_ACCOUNT_SID=your_twilio_account_sid_here
-   TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
-   TWILIO_PHONE_NUMBER=your_twilio_phone_number_here
-   FRONTEND_URL=http://localhost:3000
-   ```
+## 🚀 Quick Start
 
-4. **Start MongoDB**
-   ```bash
-   # Install MongoDB locally or use MongoDB Atlas
-   mongod
-   ```
+### Prerequisites
 
-5. **Run the server**
-   ```bash
-   # Development mode
-   npm run dev
-   
-   # Production mode
-   npm start
-   ```
+- **Node.js**: 16.0.0 or higher
+- **MongoDB**: 5.0.0 or higher
+- **npm**: 8.0.0 or higher
 
-## API Endpoints
+### 1. Installation
+
+```bash
+cd backend
+npm install
+```
+
+### 2. Environment Configuration
+
+Create a `.env` file in the backend directory:
+
+```bash
+# Database
+MONGODB_URI=mongodb://localhost:27017/subsync
+MONGODB_URI_TEST=mongodb://localhost:27017/subsync_test
+
+# Authentication
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRE=7d
+
+# Server Configuration
+PORT=5001
+NODE_ENV=development
+
+# External Services (Optional)
+SENDGRID_API_KEY=your_sendgrid_api_key
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_phone_number
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:3000
+```
+
+### 3. Start the Server
+
+```bash
+# Development mode
+npm run dev
+
+# Production mode
+npm start
+
+# With nodemon (auto-restart)
+npm run watch
+```
+
+The server will start on `http://localhost:5001` (or the next available port).
+
+## 📡 API Endpoints
 
 ### Authentication
 
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/profile` - Get user profile
-- `PUT /api/auth/profile` - Update user profile
-- `PUT /api/auth/change-password` - Change password
-- `POST /api/auth/logout` - Logout user
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register` | Register new user |
+| `POST` | `/api/auth/login` | User login |
+| `GET` | `/api/auth/profile` | Get user profile |
+| `PUT` | `/api/auth/profile` | Update user profile |
+| `POST` | `/api/auth/logout` | User logout |
 
 ### Subscriptions
 
-- `GET /api/subscriptions` - Get all subscriptions
-- `GET /api/subscriptions/:id` - Get subscription by ID
-- `POST /api/subscriptions` - Create new subscription
-- `PUT /api/subscriptions/:id` - Update subscription
-- `DELETE /api/subscriptions/:id` - Delete subscription
-- `GET /api/subscriptions/stats/overview` - Get subscription statistics
-- `GET /api/subscriptions/due-soon` - Get subscriptions due soon
-- `PUT /api/subscriptions/:id/renew` - Renew subscription
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/subscriptions` | Get all user subscriptions |
+| `POST` | `/api/subscriptions` | Create new subscription |
+| `GET` | `/api/subscriptions/:id` | Get specific subscription |
+| `PUT` | `/api/subscriptions/:id` | Update subscription |
+| `DELETE` | `/api/subscriptions/:id` | Delete subscription |
+| `GET` | `/api/subscriptions/stats/overview` | Get subscription statistics |
 
 ### Notifications
 
-- `GET /api/notifications/preferences` - Get notification preferences
-- `PUT /api/notifications/preferences` - Update notification preferences
-- `GET /api/notifications/history` - Get notification history
-- `POST /api/notifications/test` - Send test notification
-- `POST /api/notifications/trigger/:subscriptionId` - Trigger notifications
-- `GET /api/notifications/stats` - Get notification statistics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/notifications` | Get user notifications |
+| `PUT` | `/api/notifications/preferences` | Update notification preferences |
+| `POST` | `/api/notifications/test` | Send test notification |
 
-## Data Models
+### Health & Status
 
-### User
-- Email, password, first/last name, phone
-- Notification preferences (email, SMS, reminder days)
-- Account status
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/health` | Server health check |
+| `GET` | `/api/status` | Detailed server status |
 
-### Subscription
-- Name, category, amount, billing cycle
-- Next billing date, trial end date
-- Auto-renewal settings, payment method
-- Website, account email, notes, tags
+## 🗄️ Data Models
 
-### Notification
-- User, subscription reference
-- Type (email, SMS, push)
-- Status, message, scheduled time
-- Error tracking
+### User Model
 
-## Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `PORT` | Server port | No (default: 5000) |
-| `NODE_ENV` | Environment mode | No (default: development) |
-| `MONGODB_URI` | MongoDB connection string | Yes |
-| `JWT_SECRET` | JWT signing secret | Yes |
-| `JWT_EXPIRE` | JWT expiration time | No (default: 7d) |
-| `SENDGRID_API_KEY` | SendGrid API key | No (for email) |
-| `EMAIL_FROM` | From email address | No |
-| `TWILIO_ACCOUNT_SID` | Twilio account SID | No (for SMS) |
-| `TWILIO_AUTH_TOKEN` | Twilio auth token | No (for SMS) |
-| `TWILIO_PHONE_NUMBER` | Twilio phone number | No (for SMS) |
-| `FRONTEND_URL` | Frontend URL for CORS | No |
-
-## Security Features
-
-- **Rate Limiting**: 100 requests per 15 minutes per IP
-- **Helmet**: Security headers
-- **CORS**: Cross-origin resource sharing
-- **Input Validation**: Mongoose schema validation
-- **Password Hashing**: bcryptjs with salt rounds
-- **JWT Authentication**: Secure token-based auth
-
-## Development
-
-### Scripts
-- `npm run dev` - Start development server with nodemon
-- `npm start` - Start production server
-- `npm test` - Run tests (to be implemented)
-
-### Database Setup
-1. Install MongoDB locally or use MongoDB Atlas
-2. Create database named `subtrackr`
-3. Collections will be created automatically
-
-### Testing API
-Use tools like Postman or curl to test endpoints:
-
-```bash
-# Health check
-curl http://localhost:5000/api/health
-
-# Register user
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123","firstName":"John","lastName":"Doe"}'
+```javascript
+{
+  name: String,           // User's full name
+  email: String,          // Unique email address
+  password: String,       // Hashed password
+  phone: String,          // Phone number (optional)
+  preferences: {
+    notifications: {
+      email: Boolean,      // Email notifications enabled
+      sms: Boolean,        // SMS notifications enabled
+      reminderDays: Number // Days before renewal to remind
+    }
+  },
+  createdAt: Date,        // Account creation date
+  updatedAt: Date         // Last update date
+}
 ```
 
-## Deployment
+### Subscription Model
 
-1. **Environment Setup**: Configure production environment variables
-2. **Database**: Set up MongoDB Atlas or production MongoDB instance
-3. **Email/SMS**: Configure SendGrid and Twilio credentials
-4. **Process Manager**: Use PM2 or similar for production
-5. **Reverse Proxy**: Use Nginx for SSL termination and load balancing
+```javascript
+{
+  name: String,           // Subscription service name
+  category: String,       // Service category (streaming, software, etc.)
+  amount: Number,         // Monthly/annual cost
+  billingCycle: String,   // monthly, yearly, quarterly
+  nextBillingDate: Date,  // Next billing date
+  isActive: Boolean,      // Subscription status
+  website: String,        // Service website URL
+  notes: String,          // Additional notes
+  tags: [String],         // Custom tags for organization
+  source: String,         // How subscription was added
+  createdAt: Date,        // Creation date
+  updatedAt: Date         // Last update date
+}
+```
 
-## Contributing
+### Notification Model
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+```javascript
+{
+  user: ObjectId,         // Reference to user
+  subscription: ObjectId,  // Reference to subscription
+  type: String,           // email, sms, push
+  message: String,        // Notification content
+  status: String,         // pending, sent, failed
+  scheduledFor: Date,     // When to send notification
+  sentAt: Date,           // When notification was sent
+  error: String           // Error message if failed
+}
+```
 
-## License
+## 🔧 Configuration
 
-MIT License - see LICENSE file for details 
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `5001` |
+| `NODE_ENV` | Environment mode | `development` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/subsync` |
+| `JWT_SECRET` | JWT signing secret | Required |
+| `JWT_EXPIRE` | JWT expiration time | `7d` |
+| `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:3000` |
+
+### CORS Configuration
+
+The backend automatically configures CORS to allow:
+- Frontend application (`http://localhost:3000`)
+- Chrome extension (`chrome-extension://`)
+- All origins in development mode
+
+### Rate Limiting
+
+- **General API**: 1000 requests per 15 minutes
+- **Authentication**: 30 requests per minute
+- **Subscription Creation**: 10 requests per minute
+
+## 🛡️ Security Features
+
+### Authentication & Authorization
+
+- **JWT Tokens**: Secure, stateless authentication
+- **Password Hashing**: bcrypt with salt rounds
+- **Token Expiration**: Configurable expiration times
+- **Route Protection**: Middleware-based authorization
+
+### Data Protection
+
+- **Input Validation**: Comprehensive request validation
+- **SQL Injection Prevention**: MongoDB query sanitization
+- **XSS Protection**: Helmet security headers
+- **CORS Configuration**: Secure cross-origin requests
+
+### API Security
+
+- **Rate Limiting**: Prevents API abuse
+- **Request Validation**: Ensures data integrity
+- **Error Handling**: Secure error responses
+- **Logging**: Comprehensive request logging
+
+## 📊 Performance Optimization
+
+### Database Optimization
+
+- **Indexing**: Strategic database indexes
+- **Query Optimization**: Efficient MongoDB queries
+- **Connection Pooling**: Optimized database connections
+- **Caching**: Redis integration (optional)
+
+### API Performance
+
+- **Response Compression**: Gzip compression
+- **Request Validation**: Early validation and rejection
+- **Async Operations**: Non-blocking I/O operations
+- **Memory Management**: Efficient memory usage
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Unit tests
+npm test
+
+# Integration tests
+npm run test:integration
+
+# Coverage report
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+### Test Environment
+
+- **Test Database**: Separate MongoDB instance
+- **Mock Services**: External service mocking
+- **Test Data**: Seeded test data
+- **Cleanup**: Automatic test cleanup
+
+## 🚀 Deployment
+
+### Production Setup
+
+1. **Environment Variables**
+   ```bash
+   NODE_ENV=production
+   PORT=5001
+   MONGODB_URI=mongodb://your-production-db
+   JWT_SECRET=your-production-secret
+   ```
+
+2. **Process Management**
+   ```bash
+   # Using PM2
+   npm install -g pm2
+   pm2 start server.js --name "subsync-backend"
+   pm2 startup
+   pm2 save
+   ```
+
+3. **Reverse Proxy (Nginx)**
+   ```nginx
+   server {
+       listen 80;
+       server_name api.subsync.app;
+       
+       location / {
+           proxy_pass http://localhost:5001;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+### Docker Deployment
+
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE 5001
+CMD ["npm", "start"]
+```
+
+## 📈 Monitoring & Logging
+
+### Logging
+
+- **Request Logging**: All API requests logged
+- **Error Logging**: Comprehensive error tracking
+- **Performance Logging**: Response time monitoring
+- **Security Logging**: Authentication and authorization events
+
+### Health Checks
+
+- **Database Connectivity**: MongoDB connection status
+- **API Endpoints**: Endpoint availability testing
+- **External Services**: Third-party service status
+- **System Resources**: Memory and CPU usage
+
+## 🔄 Chrome Extension Integration
+
+### Real-time Sync
+
+The backend provides instant synchronization for the Chrome extension:
+
+- **WebSocket Support**: Real-time updates (optional)
+- **Push Notifications**: Instant subscription updates
+- **Badge Updates**: Extension badge synchronization
+- **Context Menu**: Right-click subscription tracking
+
+### Extension API
+
+Special endpoints designed for extension integration:
+
+- **Quick Add**: Fast subscription creation
+- **Bulk Operations**: Multiple subscription management
+- **Status Updates**: Real-time subscription status
+- **Analytics**: Extension-specific statistics
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Database Connection Errors:**
+- ✅ Check MongoDB is running
+- ✅ Verify connection string format
+- ✅ Check network connectivity
+- ✅ Verify authentication credentials
+
+**CORS Errors:**
+- ✅ Check CORS configuration
+- ✅ Verify frontend URL in environment
+- ✅ Check Chrome extension origin
+- ✅ Review browser console errors
+
+**Authentication Issues:**
+- ✅ Verify JWT secret is set
+- ✅ Check token expiration
+- ✅ Verify user exists in database
+- ✅ Check password hashing
+
+**Performance Issues:**
+- ✅ Check database indexes
+- ✅ Monitor memory usage
+- ✅ Review query performance
+- ✅ Check rate limiting settings
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+# Set debug environment variable
+DEBUG=subsync:*
+
+# Or in code
+console.log('🔍 SubSync Backend Debug Mode Enabled');
+```
+
+## 🤝 Contributing
+
+### Development Guidelines
+
+1. **Code Style**: Follow existing patterns
+2. **Testing**: Add tests for new features
+3. **Documentation**: Update API documentation
+4. **Security**: Follow security best practices
+5. **Performance**: Consider performance implications
+
+### API Development
+
+- **Versioning**: Use semantic versioning
+- **Backward Compatibility**: Maintain API compatibility
+- **Error Handling**: Consistent error responses
+- **Validation**: Comprehensive input validation
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Node.js Community**: For the amazing runtime
+- **Express Team**: For the web framework
+- **MongoDB**: For the database solution
+- **SubSync Team**: For the subscription management platform
+
+## 📞 Support
+
+- **Documentation**: [docs.subsync.app](https://docs.subsync.app)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/subsync/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/subsync/discussions)
+- **Email**: support@subsync.app
+
+---
+
+**Build robust subscription management APIs with SubSync! 🚀**
+
+*SubSync Backend - Powering intelligent subscription management.* 

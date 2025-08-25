@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const net = require('net');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -14,17 +15,62 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// Dynamic CORS configuration - allow any localhost port and Chrome extensions
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
+  'http://localhost:3004',
+  'http://localhost:3005'
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: function (origin, callback) {
+    // For development, allow all origins (remove this in production)
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow any localhost port
+    if (origin.startsWith('http://localhost:')) {
+      return callback(null, true);
+    }
+    
+    // Allow specific origins from environment
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow requests from Chrome extensions (any chrome-extension:// origin)
+    if (origin.startsWith('chrome-extension://')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 1000 // limit each IP to 1000 requests per windowMs (more reasonable for extensions)
 });
 app.use(limiter);
+
+// More lenient rate limiting for auth endpoints (extensions need to check auth frequently)
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30 // limit each IP to 30 auth requests per minute
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -32,6 +78,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Logging middleware
 app.use(morgan('combined'));
+
+// Apply auth rate limiting to auth routes
+app.use('/api/auth', authLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,7 +94,25 @@ app.get('/api/health', (req, res) => {
     status: 'OK', 
     message: 'SubTrackr API is running',
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    port: process.env.ACTUAL_PORT || process.env.PORT || 5000,
+    cors: {
+      allowedOrigins: allowedOrigins,
+      dynamicLocalhost: true
+    }
+  });
+});
+
+// Server info endpoint for frontend discovery
+app.get('/api/server-info', (req, res) => {
+  res.json({
+    port: process.env.ACTUAL_PORT || process.env.PORT || 5000,
+    baseUrl: `http://localhost:${process.env.ACTUAL_PORT || process.env.PORT || 5000}`,
+    cors: {
+      dynamicLocalhost: true,
+      allowedOrigins: allowedOrigins
+    },
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -81,22 +148,74 @@ const connectDB = async () => {
   }
 };
 
+// Function to check if a port is available
+const isPortAvailable = (port) => {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    
+    server.listen(port, () => {
+      server.once('close', () => {
+        resolve(true);
+      });
+      server.close();
+    });
+    
+    server.on('error', () => {
+      resolve(false);
+    });
+  });
+};
+
+// Function to find an available port
+const findAvailablePort = async (startPort) => {
+  let port = startPort;
+  const maxAttempts = 10; // Try up to 10 different ports
+  
+  for (let i = 0; i < maxAttempts; i++) {
+    if (await isPortAvailable(port)) {
+      return port;
+    }
+    port++;
+  }
+  
+  throw new Error(`Could not find an available port after ${maxAttempts} attempts`);
+};
+
 // Start server
 const startServer = async () => {
-  const PORT = process.env.PORT || 5000;
+  const preferredPort = parseInt(process.env.PORT) || 5000;
   
-  // Try to connect to database
-  await connectDB();
-  
-  app.listen(PORT, () => {
-    console.log(`🚀 SubTrackr API server running on port ${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  try {
+    // Try to connect to database
+    await connectDB();
     
-    if (mongoose.connection.readyState !== 1) {
-      console.log('\n⚠️  Note: Database features will be limited without MongoDB connection');
-    }
-  });
+    // Find an available port
+    const actualPort = await findAvailablePort(preferredPort);
+    
+    app.listen(actualPort, () => {
+      console.log(`🚀 SubTrackr API server running on port ${actualPort}`);
+      console.log(`📊 Health check: http://localhost:${actualPort}/api/health`);
+      
+      if (actualPort !== preferredPort) {
+        console.log(`⚠️  Port ${preferredPort} was busy, using port ${actualPort} instead`);
+      }
+      
+      // Update CORS to include the actual port
+      console.log(`🔗 Server will accept requests from any localhost port`);
+      console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3001'}`);
+      
+      if (mongoose.connection.readyState !== 1) {
+        console.log('\n⚠️  Note: Database features will be limited without MongoDB connection');
+      }
+      
+      // Export the port for potential use by other processes
+      process.env.ACTUAL_PORT = actualPort.toString();
+    });
+    
+  } catch (error) {
+    console.error('❌ Failed to start server:', error.message);
+    process.exit(1);
+  }
 };
 
 // Handle graceful shutdown
