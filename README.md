@@ -9,7 +9,7 @@
 
 ## 🚀 What is SubSync?
 
-SubSync is a comprehensive subscription management solution that combines a powerful web application with a smart Chrome extension. It automatically detects subscription services on websites, tracks your spending, and provides insights to help you manage your recurring expenses.
+SubSync formelly substrackr is a comprehensive subscription management solution that combines a powerful web application with a smart Chrome extension. It automatically detects subscription services on websites, tracks your spending, and provides insights to help you manage your recurring expenses.
 
 ### ✨ Key Features
 
